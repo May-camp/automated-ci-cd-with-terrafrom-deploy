@@ -1,0 +1,12 @@
+**/.terraform/*
+
+# Ignore development/local override files (like what tflocal creates)
+**/*_override.tf
+**/*_override.tf.json
+
+# Ignore CLI configuration files
+.terraformrc
+terraform.rc
+*.tfstate
+*.tfstate.*
+.terraform.tfstate.lock.info
