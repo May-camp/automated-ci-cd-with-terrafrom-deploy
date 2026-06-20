@@ -1,0 +1,55 @@
+image:
+  name: hashicorp/terraform:1.5.7
+  entrypoint: [""]
+
+variables:
+  AWS_ACCESS_KEY_ID: "mock_access_key"
+  AWS_SECRET_ACCESS_KEY: "mock_secret_key"
+  AWS_DEFAULT_REGION: "us-east-1"
+  FF_NETWORK_PER_BUILD: "true"
+
+default:
+  services:
+    - name: localstack/localstack:3.0.0
+      alias: localstack
+
+before_script:
+  - sleep 15
+  - terraform --version
+  - terraform init
+
+stages:
+  - validate
+  - plan
+  - apply
+  - destroy
+
+validate:
+  stage: validate
+  script:
+    - terraform validate
+
+plan:
+  stage: plan
+  dependencies:
+    - validate
+  script:
+    - terraform plan -refresh=false -out="planfile"
+  artifacts:
+    paths:
+        - planfile
+
+apply:
+  stage: apply
+  dependencies:
+    - plan
+  script:
+    - terraform apply -auto-approve
+  when: manual
+  allow_failure: false
+
+destroy:
+  stage: destroy
+  script:
+    - terraform destroy -auto-approve
+  when: manual
